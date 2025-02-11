@@ -6,30 +6,57 @@ Follow along with the demo to learn how to calculate crime rates using R and the
 
 ### Task 1: Load the tidyverse and install and load janitor
 
-
+```{r}
+library(tidyverse)
+library(janitor)
+```
 
 ### Task 2: Load the crime dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_annual_crime.csv
 
+```{r}
+annual_crime <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_annual_crime.csv") |> clean_names()
 
-
+```
 ### Task 3: Use janitor to clean up the column names
 
+```{r}
+annual_crime |> clean_names()
+```
 
 
 ### Task 4: Calculate the total crime rate for each year (picking our unit!)
 
+```{r}
+
+annual_crime <- annual_crime |> mutate(total_rate = grand_total/population * 10000)
+
+```
 
 
 ### Task 5: Calculate the violent and property crime rates for each year (same unit)
 
+```{r}
+ annual_crime |> mutate(violent_capita = violent_crime_total/population * 10000,
+                       property_capita = property_crime_total/population * 10000)
+```
+
+```{r}
+
+annual_crime |> group_by(year) |>
+  summarise(total_rate)|> 
+  arrange(desc(total_rate))
+
+```
 
 
 ### Task 6: Describe our results
 
 Write a few sentences about what you found in the data. What years had the highest crime rates? What years had the lowest crime rates? Does the pattern match your expectations?
 
-
-
+The year that has the lowest crime rate is 2020 and 2019. The years with the highest crimes
+are the 1980 and 1981. It does fit my expectation pattern because I have read and 
+heard a lot of how crime was when I was growing up and how it was when my parents
+were growing up.
 
 When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
 
