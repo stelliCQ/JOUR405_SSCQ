@@ -39,7 +39,6 @@ team_aces <- team_aces |> mutate(percentile = ntile(total_aces, 100))
 
 ```
 
-
 ### Task 5: Describe the percentiles
 
 Write a couple of sentences that puts Maryland into context with the other teams in the dataset. You can do some Internet research to help with this.
