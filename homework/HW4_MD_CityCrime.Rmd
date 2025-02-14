@@ -1,5 +1,6 @@
 ---
 title: "HW4 MD CityCrime"
+Stella: "Stella S. Canino"
 ---
 
 In this assignment, we will be working with a dataset of total crimes reported by Maryland cities for two consecutive years. You'll load the data, calculate the violent and property crime rates for each city for both years, and then calculate the percentage change in the crime rates between the two years. You'll also write a short story based on your findings.
@@ -9,6 +10,8 @@ In this assignment, we will be working with a dataset of total crimes reported b
 You will need to load the tidyverse library and the janitor library
 
 ```{r}
+library(tidyverse)
+library(janitor)
 ```
 
 Then you'll load the data from the web. The URL for the data is: https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_cities_crime_2019_2020.csv. You will create a dataframe called `md_cities` that contains the data from this URL.
@@ -16,12 +19,21 @@ Then you'll load the data from the web. The URL for the data is: https://raw.git
 ### Task 2: Load the Data
 
 ```{r}
+md_cities <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_cities_crime_2019_2020.csv")
+
 ```
 ### Task 3: Calculating Rates
 
 Calculate violent and property crime rates for each city for both years using `mutate()`. You'll create four new columns: `violent_rate_2019`, `property_rate_2019`, `violent_rate_2020`, and `property_rate_2020`. You'll need to figure out the proper unit rate, given that there are varying populations. There's no perfect choice; choose the one that works best for you. Save the results to a new dataframe called `md_cities_rates`.
 
 ```{r}
+
+md_cities_rates <- md_cities |> mutate(violent_rate_2019 = violent2019/pop2019 * 100,
+                                       property_rate_2019 = property2019/pop2019 * 100,
+                                        violent_rate_2020 = violent2020/pop2020 * 100,
+                                        property_rate_2020 = property2020/pop2020 * 100)
+
+
 ```
 
 ### Task 4: Describe the Rates
@@ -30,17 +42,56 @@ Examine the new dataframe, `md_cities_rates`, by clicking on it in the Environme
 
 ANSWER HERE
 
+The cities with the highest crime rate were Baltimore, Ocean City and Williamsport in 2019.
+In 2020, it was Ocean city, Baltimore, and Cambridge. In the case for property crime in 2019,
+it was Ocean City, Oakland, Elkton, and Hyattsville. For 2020, it was Ocean City, Colmar Manor,
+Landover Hills, and Oakland.
+
+The pattern that we see is that Ocean City topped twice in violent and property
+crimes in 2020 and 2019. Furthermore, a lot of the cities that were in the top five
+in crime incidents are repeated in 2020 and 2019 with no a wide range of difference.
+Overall, crime is not as high per person than previously thought of. 
+
+The story here is that Ocean City is the city in Maryland with the highest rate
+of violent and property crime per 100 residents. 
+
+```{r}
+md_cities_rates |> group_by(city) |>
+  summarise(property_rate_2020) |>
+  arrange(desc(property_rate_2020))
+
+```
+
 
 ### Task 5: Calculate Percentage Change
 
 Let's add two percentage change columns to your dataframe: one for violent crime rates and one for property crime rates. You'll calculate the percentage change between 2019 and 2020 for each city. Save the results to a new dataframe called `md_cities_change`.
 
+
 ```{r}
+md_cities_change <- md_cities |> 
+  mutate(Property_Change = (property2020 - property2019) / property2019 * 100,
+         Crime_change = (violent2020 - violent2019) / violent2019 * 100)
+                                        
 ```
 
 ### Task 7: Describe Percentage Changes
 
+```{r}
+md_cities_change |> group_by(city) |>
+  summarise(Property_Change) |>
+  arrange(desc(Property_Change))
+
+```
+
+
 Look at the `md_cities_change` dataframe by clicking on it in the Environment tab in RStudio. Write a couple of sentences describing the percentage change results. What's more interesting here, the patterns or the outliers? What's the story in the data?
+
+Overall, property and violent crime went down in the majority of cities with high population
+in Maryland. There are outliers that in some cities crime increased by 100%, but these tend to be
+cities that have less than 10 crimes for very small populations.
+
+The story is that both types of crime is down in 2020 compared to 2019.
 
 ANSWER HERE
 
@@ -51,5 +102,14 @@ Write up a lede and nutgraf of a story with the _best_ story idea you've found i
 ANSWER HERE
 
 ### Task 9: Save Your Work and Put it on GitHub
+
+Ocean City has the highest rate of property crime in 2020 with 12 out of every 100 
+residents affected.
+
+Ocean City, a popular summer tourism destination, saw a spike in property crime
+that could impact its local economy. In contrast, Baltimore reporter 3 property
+crimes per 100 residents compared to Ocean City.
+
+
 
 Save this notebook, then commit it to your local repository. Push the changes to your GitHub repository and submit the URL for this file in ELMS.
