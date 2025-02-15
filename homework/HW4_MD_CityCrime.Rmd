@@ -110,6 +110,42 @@ Ocean City, a popular summer tourism destination, saw a spike in property crime
 that could impact its local economy. In contrast, Baltimore reporter 3 property
 crimes per 100 residents compared to Ocean City.
 
-
-
 Save this notebook, then commit it to your local repository. Push the changes to your GitHub repository and submit the URL for this file in ELMS.
+
+**TASK 10** 
+Your task will be to take the violent crime rates for 2020 and do three things:
+
+Using the 2020 violent crime rate, calculate the percentiles using `ntile()`. Save the results to a new dataframe called `md_cities_percentiles`. How many cities are above the 90th percentile?
+
+There are 10 cities above the 90th percentile. 
+
+```{r}
+
+md_cities_percentiles <- md_cities |> 
+  mutate(percentile = ntile(violent2020,100))
+  
+md_cities_percentiles |>
+   filter(percentile > 90) |>
+  arrange(desc(percentile))
+
+```
+
+Calculate the Interquartile Range of the 2020 violent crime rate using `summarize()` and R's `IQR()` function. The syntax is similar to how `mean()` works.
+
+The IQR is 17. 
+
+```{r}
+
+md_cities_percentiles |> 
+  summarise(IQR_violent2020 = IQR(violent2020))
+
+```
+
+Do the results change your best story idea from the previous assignment? Why or why not?
+
+Yes, this does change what was my previous story idea since Baltimore City,
+Salisbury and Annapolis had the highest crime rates per percentile in 2020.
+This changes how we explain to our audiences how crime is looking in Maryland.
+
+
+
