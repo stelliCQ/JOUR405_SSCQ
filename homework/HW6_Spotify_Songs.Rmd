@@ -7,18 +7,27 @@ In this assignment, you will be working with a dataset of songs played on Spotif
 ### Task 1: Load the tidyverse
 
 ```{r}
+library(tidyverse)
 ```
 
 ### Task 2: Load the Spotify Songs dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/spotify_2020.csv
 
 ```{r}
+
+spotify <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/spotify_2020.csv")
+
 ```
 
 ### Task 3: Calculate the mean and standard deviation of the danceability scores
 
-Write code to calculate the mean standard deviation of the danceability scores in the Spotify dataset. Display those.
+Write code to calculate the mean and standard deviation of the danceability scores in the Spotify dataset. Display those.
+
+The mean is 0.67 and the standard deviation is 0.16.
 
 ```{r}
+
+spotify |>  summarise(mean = mean(danceability), sd = sd(danceability))
+
 ```
 
 ### Task 4: Create a histogram of the danceability scores
@@ -26,20 +35,62 @@ Write code to calculate the mean standard deviation of the danceability scores i
 Write code to create a histogram of the danceability scores in the Spotify dataset, based on the example we did in class.
 
 ```{r}
+#I used 0.1 so that I'm able to see in a more define way the different value points.
+#Bindwidth 2 just gave me a huge box.
+spotify |>  
+  ggplot() +  
+  geom_histogram(aes(x = danceability), binwidth = 0.1) 
 ```
 
 ### Task 5: Add a line to the histogram for the mean danceability score
 
-Write code to add a vertical line to the histogram for the mean danceability score, based on the example in class.
+Take the same code and add a vertical line to the histogram for the mean danceability score, based on the example in class.
 
 ```{r}
+
+spotify |>  
+  ggplot() +  
+  geom_histogram(aes(x = danceability), binwidth = 0.1) +  
+  geom_vline(xintercept = mean(spotify$danceability), color = "yellow", linetype = "dashed", size = 1) 
+
 ```
 
-### Task 6: Describe our results
 
-Write a few sentences about the distribution of danceability scores in the Spotify dataset. Is it a normal distribution, or is it skewed in one direction? What does the mean and distribution tell us about the songs in the dataset?
+### Task 6: Add two lines to the histogram to show one standard deviation
 
-### Task 7: Save Your Work and Put it on GitHub
+Take the previous code and add two lines to the histogram for the 1st standard deviation below and above the mean score.
+
+```{r}
+
+spotify |>  
+  ggplot(aes(x = danceability)) +  
+  geom_histogram(binwidth = 0.1) +  
+  geom_vline(xintercept = mean(spotify$danceability), color = "yellow", linetype = "dashed", size = 1) +  
+  geom_vline(xintercept = mean(spotify$danceability) - sd(spotify$danceability), color = "orange", linetype = "dashed", size = 1) +  
+  geom_vline(xintercept = mean(spotify$danceability) + sd(spotify$danceability), color = "red", linetype = "dashed", size = 1)  
+```
+
+### Task 7: Describe our results and pitch a story
+
+Write a few sentences about the distribution of danceability scores in the Spotify dataset. Is it a normal distribution, or is it skewed in one direction? What does the mean and one standard distribution tell us about the songs in the dataset? Draft a short story pitch from this data.
+
+
+The danceability score is not a completely perfect distribution since its skewed
+to the right, meaning that the majority of songs in 2020 were more danceable than the average. 
+
+The mean tells us that the average of all the songs in 2020 were highly ranked as danceable. 
+The standard deviation below the mean shows that a good chunck of the songs 
+werent very danceable and there isn't a lot of songs that were The SD below the 
+mean shows us that a large majority of the songs in 2020 were scored high in 
+danceable. 
+
+
+Story pitch:
+A good story idea is take the songs that are one SD above the mean and find
+what are the top musical genres that got the highest score.By analyzing the songs
+we can find what genre dominated the danceability. Was it pop, rap or something
+else? 
+
+### Task 8: Save Your Work and Put it on GitHub
 
 Save this notebook, then commit it to your local repository. Push the changes to your GitHub repository and submit the URL for this file in ELMS.
-
