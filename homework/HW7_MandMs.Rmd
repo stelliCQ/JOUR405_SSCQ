@@ -6,26 +6,67 @@ In this assignment, you'll be picking up where you left off with the M&Ms activi
 
 ### Task 1: Load the tidyverse
 
+```{r}
+library(tidyverse)
+```
 
 ### Task 2: Load the M&Ms dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/mandms.csv
 
+```{r}
+mandm <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/mandms.csv")
+```
 
-### Task 3: Sample 5 rows of data from the dataset
+### Task 3: Sample 5 rows of data from the dataset, and then sample 10 rows, saving each to separate dataframes called sample5 and sample10.
+
+```{r}
+
+sample5 <- mandm |> sample_n(5)
+sample10 <- mandm |> sample_n(10)
+
+view(sample10)
+view(sample5)
+
+```
+
+### Task 4: Calculate the mean and standard deviation of the samples, using one of the colors.
+
+```{r}
+sample5 |> summarise(mean(red), sd(red))
+  
+  sample10 |> summarise(mean(red), sd(red))
+
+```
 
 
-### Task 4: Calculate the mean age and standard deviation of the sample, using either the blue or white number of M&Ms
+### Task 5: Calculate the mean and standard deviation of the population, using the same color as Task 4
 
+```{r}
 
-### Task 5: Calculate the mean age and standard deviation of the population, using the same measure as in Task 4
+mandm |> summarise(mean(red), sd(red))
 
+```
 
 ### Task 6: Compare the sample and population statistics
 
-Compare the two sets of means and standard deviations. Are they similar?
+Compare the three sets of means and standard deviations. Are they similar?
+
+The population and sample10 mean and median for red are more similar than the sample of 
+five. In population, the mean was 72.98 and SD 16.45. For the sample of 10, the mean
+was 71 and SD was 18. However, there was more variation in the results for the 
+sample of 5 with SD being 13 and mean 68.6. Sample 5 wasn't super far off from the 
+other two samples, but it was a substantial amount.
+
 
 ### Task 7: Describe the results
 
 Write a few sentences about what you found in the data. What does this tell you about the M&Ms dataset and about the act of random sampling?
+
+The M and M dataset told me that you can really get a good sense of where the
+population stands without having to study the entire group. With the correct 
+amount in a sample that's sufficiently randomized, you can get the same results
+without so much effort or resources. This exercise made me understand why sampling a small
+population isn't as shady as one thought. 
+
 
 
 When finished, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
