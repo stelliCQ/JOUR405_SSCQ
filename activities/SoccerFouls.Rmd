@@ -39,7 +39,8 @@ soccerfoul |> summarise(correlation = cor(fouls, goal_diff, method = "pearson"))
 
 ```{r}
 
-soccerfoul |> ggplot() + geom_point(aes(x=goal_diff, y = fouls))
+soccerfoul |> ggplot() + geom_point(aes(x=goal_diff, y = fouls)) +
+  geom_smooth(aes(x=goal_diff, y=fouls), methods= "lm")
 
 ```
 
