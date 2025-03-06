@@ -13,6 +13,8 @@ Your task in this assignment will be to examine the relationship between those t
 ### Task 1: Load the tidyverse
 
 ```{r}
+library(tidyverse)
+
 ```
 
 ### Task 2: Load the GDP and DJIA data
@@ -20,6 +22,9 @@ Your task in this assignment will be to examine the relationship between those t
 Load the GDP data from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/gdp_djia.csv
 
 ```{r}
+
+GDPdata <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/gdp_djia.csv")
+
 ```
 
 ### Task 3: Calculate the correlation coefficient
@@ -27,6 +32,9 @@ Load the GDP data from https://raw.githubusercontent.com/dwillis/jour405/refs/he
 Use the `cor()` function to calculate the correlation coefficient between the DJIA and GDP.
 
 ```{r}
+
+GDPdata |> summarise(correlation = cor(GDP, DJIA, method = "pearson"))
+
 ```
 
 ### Task 4: Create a scatterplot
@@ -34,12 +42,29 @@ Use the `cor()` function to calculate the correlation coefficient between the DJ
 Use the `ggplot()` function to create a scatterplot of the DJIA and GDP. Be sure to label your axes and add a title.
 
 ```{r}
+
+GDPdata |> 
+  ggplot(aes(x = GDP, y = DJIA)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_text(aes(label = Quarter), size = 3, vjust = -1) +
+  labs(
+    title = "Relationship between GDP and DJIA in the United States by Quarter (2013-2024)", 
+    x = "Gross Domestic Product (GDP)",
+    y = "Dow Jones Industrial Average (DJIA)"
+  ) +
+  theme_minimal()
+
 ```
 
 ### Task 5: Describe our results
 
 Write a few sentences about the relationship between the DJIA and GDP. Is there a strong correlation between the two variables? What does the scatterplot show?
 
+The relationship between DJIA and GDP is a very high and positive correlation, with a 0.9 calculated via the coefficient.
+We see in the scatterplot that the majority of points on the graph are very close to the line of best fit, which
+shows a strong linear relationship. The results also show that US economic growth (calculated by GDP), is linked closely
+with the stock markets (DJIA). IT DOESN'T MEAN THAT ONE CAUSES THE OTHER!
 
 When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
 
