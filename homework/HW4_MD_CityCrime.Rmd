@@ -128,16 +128,17 @@ md_cities_percentiles |>
    filter(percentile > 90) |>
   arrange(desc(percentile))
 
-```
 
+```
+##WRONG ==> It's 0.419
 Calculate the Interquartile Range of the 2020 violent crime rate using `summarize()` and R's `IQR()` function. The syntax is similar to how `mean()` works.
 
 The IQR is 17. 
 
 ```{r}
 
-md_cities_percentiles |> 
-  summarise(IQR_violent2020 = IQR(violent2020))
+md_cities_rates |> 
+  summarise(IQR_violent2020 = IQR(violent_rate_2020))
 
 ```
 
@@ -146,6 +147,4 @@ Do the results change your best story idea from the previous assignment? Why or 
 Yes, this does change what was my previous story idea since Baltimore City,
 Salisbury and Annapolis had the highest crime rates per percentile in 2020.
 This changes how we explain to our audiences how crime is looking in Maryland.
-
-
 

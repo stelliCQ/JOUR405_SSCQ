@@ -43,6 +43,12 @@ car_theft |>
 ### Task 5: Add a line to the histogram that shows the mean of the number of car thefts
 
 ```{r}
+ggplot(car_theft) + 
+  geom_histogram(aes(x = count), binwidth = 2) + 
+  geom_vline(xintercept = mean(car_theft$count, na.rm = TRUE), color = "pink", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean(car_theft$count, na.rm = TRUE) - sd(car_theft$count, na.rm = TRUE), 
+             color = "purple", linetype = "dashed", size = 1)
+
 
 ```
 

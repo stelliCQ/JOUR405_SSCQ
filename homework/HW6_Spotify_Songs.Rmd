@@ -29,7 +29,6 @@ The mean is 0.67 and the standard deviation is 0.16.
 spotify |>  summarise(mean = mean(danceability), sd = sd(danceability))
 
 ```
-
 ### Task 4: Create a histogram of the danceability scores
 
 Write code to create a histogram of the danceability scores in the Spotify dataset, based on the example we did in class.

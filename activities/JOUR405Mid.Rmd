@@ -1,0 +1,456 @@
+---
+title: "R Notebook Sheet for JOUR405 Exam"
+#This is a collection of the code!
+#Bellow it's the JOUR405 Notes
+---
+*Basics*
+
+*This is to assign stuff. 
+```{r}
+x <- 1
+y <- 2
+z <- 3
+
+#just to see if it worked; made it do math.
+x + y
+
+#This calls tha value N=20
+N <- 15+5
+
+5+x
+# =6
+
+#You'll need to look up the function to calculate a square root.
+p <- sqrt(16)
+```
+
+*Calculating averages*
+
+```{r}
+#Calculating Averages
+library(tidyverse)
+
+pg_crime <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_crime_totals_2024.csv")
+
+#Calculate the total number of incidents per month for each category using `mutate()`, calling the new column `total_incidents`. Then calculate the average number of incidents per month for each category of crime, calling the new column `average_incidents`. Assign the result to a new dataframe called `pg_crime_averages`.
+
+pg_crime_averages <- pg_crime |> mutate(total_incidents = Jan + Feb + Mar + Apr 
+                                        + May + Jun + Jul + Aug + Sep + Oct + Nov + Dec) 
+
+#Hey! I put this code in because ROBBERY  RESIDENTIAL was giving me NA in the total_incidents column. 
+pg_crime_averages <- pg_crime |> 
+  mutate(total_incidents = rowSums(across(Jan:Dec), na.rm = TRUE))
+
+#THIS IS THE AVERAGE!!!
+pg_crime_averages <- pg_crime_averages |> mutate(average_incidents = `total_incidents`/12)
+
+```
+
+*Mean, Median, Max and Min*
+
+```{r}
+### Task 4: Calculate the Mean and Median of the Salaries
+
+#Write code to calculate the mean and median of the salaries in the dataset using the `summarize()` function. You don't need to make a new dataframe, just display the results.
+
+wh_salaries |> summarize(salary_mean = mean(salary),
+                         salary_median = median(salary))
+
+#Take the code you just wrote and add in the minimum and maximum salaries (the functions for that are `min()` and `max()`). Your results should show four columns: mean_salary, median_salary, min_salary, max_salary.
+
+wh_salaries |> summarize(
+                         salary_max = max(salary),
+                          salary_min = min(salary))
+```
+
+*Rates and percent change*
+
+```{r}
+library(janitor)
+
+#Use janitor to clean the names.
+annual_crime |> clean_names()
+
+#Calculate violent and property crime rates for each city for both years using `mutate()`. You'll create four new columns: `violent_rate_2019`, `property_rate_2019`, `violent_rate_2020`, and `property_rate_2020`. You'll need to figure out the proper unit rate, given that there are varying populations. There's no perfect choice; choose the one that works best for you.
+md_cities_rates <- md_cities |> mutate(violent_rate_2019 = violent2019/pop2019 * 100,
+                                       property_rate_2019 = property2019/pop2019 * 100,
+                                        violent_rate_2020 = violent2020/pop2020 * 100,
+                                        property_rate_2020 = property2020/pop2020 * 100)
+
+#Let's add two percentage change columns to your dataframe: one for violent crime rates and one for property crime rates. You'll calculate the percentage change between 2019 and 2020 for each city. Save the results to a new dataframe called `md_cities_change`.
+
+md_cities_change <- md_cities |> 
+  mutate(Property_Change = (property2020 - property2019) / property2019 * 100,
+         Crime_change = (violent2020 - violent2019) / violent2019 * 100)
+
+#This code makes it easier to see results!
+md_cities_change |> group_by(city) |>
+  summarise(Property_Change) |>
+  arrange(desc(Property_Change)) 
+```
+
+*Histogram Code, Mean, SD*
+
+```{r}
+#Write code to calculate the mean and standard deviation of the danceability scores in the Spotify dataset. Display those.
+
+spotify |>  summarise(mean = mean(danceability), sd = sd(danceability))
+
+#Write code to create a histogram of the danceability scores in the Spotify dataset, based on the example we did in class.
+spotify |>  
+  ggplot() +  
+  geom_histogram(aes(x = danceability), binwidth = 0.1)  #binwidth is so chunky u want the histogram to look.
+
+#Take the same code and add a vertical line to the histogram for the mean danceability score, based on the example in class. Add two lines to the histogram for the 1st standard deviation below and above the mean score.
+
+spotify |>  
+  ggplot(aes(x = danceability)) +  
+  geom_histogram(binwidth = 0.1) +  
+  geom_vline(xintercept = mean(spotify$danceability), color = "yellow", linetype = "dashed", size = 1) +  
+  geom_vline(xintercept = mean(spotify$danceability) - sd(spotify$danceability), color = "orange", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = mean(spotify$danceability) + sd(spotify$danceability), color = "red", linetype = "dashed", size = 1)  
+
+#The yellow line is the mean. 
+#The orange line is one standard deviation below the mean
+#The red line is one standard deviation above the mean.
+```
+
+*Sampling*
+
+```{r}
+#Task 3: Sample 5 rows of data from the dataset, and then sample 10 rows, saving each to separate dataframes called sample5 and sample10.
+
+sample5 <- mandm |> sample_n(5)
+sample10 <- mandm |> sample_n(10)
+
+view(sample10)
+view(sample5)
+
+#Calculate the mean and standard deviation of the samples, using one of the colors.
+
+sample5 |> summarise(mean(red), sd(red))
+  
+  sample10 |> summarise(mean(red), sd(red))
+ 
+  #Compare sample con mean 
+  mandm |> summarise(mean(red), sd(red))
+
+```
+
+*Scatterplot and correlation*
+
+```{r}
+#USE THIS CODE IN THE CASE WHEN THEY DON'T GIVE U THE DATA SET FOR THIS
+set.seed(42)
+population <- tibble(
+  age = sample(18:80, 1000, replace = TRUE))
+
+head(population)
+
+#Use the `cor()` function to calculate the correlation coefficient between the DJIA and GDP.
+GDPdata |> summarise(correlation = cor(GDP, DJIA, method = "pearson"))
+
+#Use the `ggplot()` function to create a scatterplot of the DJIA and GDP. Be sure to label your axes and add a title.
+GDPdata |> 
+  ggplot(aes(x = GDP, y = DJIA)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_text(aes(label = Quarter), size = 3, vjust = -1) +
+  labs(
+    title = "Relationship between GDP and DJIA in the United States by Quarter (2013-2024)", 
+    x = "Gross Domestic Product (GDP)",
+    y = "Dow Jones Industrial Average (DJIA)"
+  ) +
+  theme_minimal()
+```
+
+**Notes to use in the exam**
+
+Quiz 1 Information
+- The primary goal of precision journalism is to apply social and behavioral science research methods to journalism.
+
+-	Precision journalism threatened the twin traditions of journalistic passivity and journalistic innocence. The former tradition holds that media should report news, not make news. It means treating journalism as if it were a science, adopting scientific method, scientific objectivity, and scientific ideals to the entire process of mass communication.  
+
+- It's essential to ensure that the base is the same when comparing percentages to ensure the comparisons are valid and meaningful. 
+
+Things to do with data:
+-	Collect it
+-	Store it
+-	Retrieve it
+-	Analyze it
+-	Reduce it 
+-	Communicate it
+
+- Categorical data has categories that don't have more importance than one or the other (Ex. Marital status).Continuous data can take any range of numbers and rank them (Ex. BMI)
+- Most common measure of central tendency is the mean. The mode of a dataset is the most frequently occurring value. 
+- When a distribution is symmetric, the mean and the median are equal.
+
+Chapter 2
+
+- Decimal points are for meaning, not for emphasis.
+- Percent difference means just what it says: the difference between two values taken as a percentage of whichever value you are using as the base. 
+
+- When dollar amounts are compared across time, it is usually a good idea to detrend the figures by taking out the effect of inflation.
+
+- Descriptive statistics involve using a few numbers to summarize a distribution.
+    - Aspect 1: Where its center is located.
+      Aspect 2: How spread out it is (how much the numbers in the distribution vary from one another.)
+      Aspect 3: Describes measures of the shape of distributions. 
+      
+- Population growth is one secular trend tha can make other trends be more or less than they seem.
+
+Survey research based on sample data is subject to random error, particularly when small subgroups are examined. 
+-	The moral is that is a good idea to always look at the scatterplot before dealing with correlation.
+
+-	If nature does not like straight lines, she is not too fond of smooth logarithmic curves, either. The most interesting trends are often those that twist and turn the most exotically. 
+
+Regression residuals
+- A statistical technique for detrending that can help to control for some
+overpowering continuous variables that conceal what you are interested in.
+
+  -  The technical term is residual analysis because it looks at the residual
+  variance.
+  
+  - Standarized z-scores re-express each measurement in terms of how much
+  it deviates from a group average. 
+  
+  The most common measures of location are quartiles and percentiles.
+  
+  - Quartiles divide an ordered data set into 4 equal parts. The 3 quartiles
+  of a data set are labeled Q1, Q2,Q3.
+  - Q1 About 1/4 of the data falls on or below the first quartile.
+  - About one half of teh data falls on or below the second quartile.
+  About 3/4 of the data falls on or below the third quartile.
+  
+  Percentiles ==> Divide a dataset into 100 equal parts, and is useful for
+  comparing values. 
+  
+  Ex.90% of test scores are the same or less than your score, and 10% are the same or greater
+  
+- The median is a number that measures the "center" of the data.
+      Median is Q2.
+      
+- The interquartile range is a number that indicates the spread of the middle
+half or the middle 50% of the data. It's the difference between Q3 and Q1.
+      - This can help determine potential outliers. 
+      
+- A values is suspected to be a potential outlier if its less than 1.5 IQR,
+below Q1 or more than 1.5 IQR above the 3rd quartile.
+
+If we take the square root of the variance (reasonable enough, because it is derived from a listing of squared differences), we get a wonderfully useful statistic called the standard deviation of the mean. Or just standard deviation for short. And the number you compare it to is the mean.
+
+-	So if the standard deviation is a small value relative to the value of the mean, it means that variance is small, i.e., most of the cases are clumped tightly around the mean. If the standard deviation is a large value relative to the mean, then the variance is relatively large.
+
+-	One way to get a good picture of the shape of a distribution, including the amount of variance, is with a graph called a histogram.
+
+-	 If two things vary together, i.e., if one changes whenever the other changes, then something is connecting them. That something is usually causation. Either one variable is the cause of changes in the other, or the two are both affected by some third variable. 
+
+-	The first step in proving causation is to show a relationship or a covariance.
+
+-	The First Law of Cross-tabulation:Always base the percents in a cross-tabulation on the totals for the independent variable.
+
+-	If one of these variables is a cause of the other, it is the independent variable. The presumed effect is the dependent variable. 
+
+-	The two sets of totals, for the columns and the rows, are called marginals, because that's where you find them. 
+
+-	The question posed by Fisher's chi-square (c2) test is this: Given the marginal values, how many different ways can the distributions in the four cells vary, and what proportion of those variations is at least as unbalanced as the one we found?
+
+-	That is really all chi-square is good for: comparing what you have to what pure chance would have produced. If coincidence is a viable explanation, and it often will be, then in evaluating that explanation it helps to know how big a coincidence it takes to produce the sort of thing you found.
+
+Therefore, the lower the probability, the greater the significance level. If p = .05, it means the distribution is the sort that chance could produce in five cases out of 100. 
+
+Important!
+- In Normal distribution, 95% is the data that lies within 2 standard deviations.
+- A low standard deviation means the data points are close to the average (less variation). A high standard deviation means the data points are spread out over a wider range (more variation).
+
+*Correlation* 
+
+-	The general linear model (GLM) is a way of describing a great many kinds of interconnectedness in data. Its basic statistic is the correlation coefficient. 
+o	Its range is from -1 to 1. The farther it gets from zero, the greater the correlation, i.e., the closer the points on the plot are to a straight line. In a negative correlation the line slants down from left to right: the X variable (horizontal axis) gets smaller when the Y variable (vertical) gets bigger. In a positive correlation the line slants up: the two variables get bigger together.
+
+-	Two important tools have just been handed to you:
+o	1. When you sample, you can deal with a known error margin.
+o	2. You can know the probability that your sample will fall within that error margin.
+	The first is called sampling error.
+	The second is called confidence level.
+
+-	What you will find is some good news and some bad news. First, the bad news:
+Increasing the sample size a lot decreases the sampling error only a little.
+
+-	The good news is the converse proposition:
+o	Decreasing the sample size doesn't increase sampling error as much as you might think.
+
+Correlation DOES NOT EQUAL Causation
+
+*Sampling and data*
+
+-	Population represents the entire set of something that you wish to study.
+      - Population can be people in a state, all women, all men, cars on the road, etc.
+        o	It can very in size. 
+      o	Represented as letter N.
+      
+-	A sample is a subset of a population and a smaller percentage of the population. It can be denoted with n. 
+
+o	It’s needed to be a sample since you can’t interview everyone. This sub-set becomes the sample size.
+
+o	If the sample is representative of the population you can draw inferences of the population. 
+
+The most important way of sampling is probability since everyone has a chance
+to form part of the study. The root of it is random selection.
+
+Inside random seelction there's 2 possibilities:
+- Representative sample ==> High external validity
+- Sampling bias ==> Low external validity.
+
+Stratisfied sampling ==> Divide subjects into subgroups called strata on 
+characteristsics that they share (e.g. race, gender, educational attainment).
+Once divided, each subgroup is randomly sampled using another probability
+sampling method. (BeST ONE)
+
+Common ways of surveing small groups
+
+Random Sampling ==> The people in the smaller group must be chosen at random. The smaller the group is, the more screening interviews will be necessary to identify members of the group. If the group being studied represents only 1% of the U.S. population, screening a random sample of 100 people might only identify one member of the group being studied.
+
+Commercial lists ==> Lists based on ethnic-sounding names and/or a household’s consumer history offer a cost-efficient way to interview a small population. The downside of these lists (or “flags” as they’re sometimes known) is that they capture only a segment of the small population in question. 
+
+Moreover, the segment they capture often differs from the full population, and sometimes these differences are important.The interviews from the list contained clear biases. 
+
+Opt-in sampling ==> Respondents are not selected randomly but are recruited from a variety of sources, including through ads on social media or search engines; websites offering rewards in exchange for survey participation; or self-enrollment in an opt-in panel. 
+
+    Researchers then have the option to accept or reject volunteers in a way that brings the sample closer to the overall population on some key demographic variables, like age, race and ethnicity, and education.Tend to cover only a segment of a small population. 
+
+- Organization lists ==> You decide to do the data collection yourself or with a few assistants. You’re able to obtain a list of all the members of a few local churches. By surveying only people who are members of a church, you’re going to get a vast overestimate of the percentage of people who regularly attend religious services. 
+
+- Network sampling ==> Respondents are selected from a social network of existing members of the sample. Researchers provide incentives for participation and for participants to recruit others. These methods are popular because they are relatively efficient and low cost when compared with random sampling.
+
+- Blended samples ==> List samples, for instance, can be effectively combined with address-based random samples. A list of registered voters can represent the views of Americans who are registered to vote. But it still can’t represent the views of people who aren’t on the list, so an additional source would be needed to recruit those who aren’t registered
+
+Sampling bias --> is a type of survey bias that occurs when a research study does not use a representative sample of a target population due to poor methodology
+and/or poor execution. 
+
+Types:
+
+- Undercoverage --> Occurs when a portion of the population of interest is not accurately represented in the sample. 
+
+-	Self-selection response bias --> When respondents with specific characteristics are more willing to take part in research. In this case, participants volunteer to participate in the study. People who volunteer are more likely to have an opinion on the topic being studied. 
+
+- Survivorship bias --> the sample is focused on those who pass the selection criteria. Those who do not pass are ignored and are therefore underrepresented.
+
+- Non-response, or participation bias, occurs when a group of respondents refuses to participate in a study or drop out during the study period. This could be due to the length of the survey, the structure of the questions, or sensitive topics at hand.
+
+Recall bias -->	Memory is imperfect, and when your survey participants can’t remember correctly.
+
+Observer bias --> When researchers consciously or subconsciously influence the interpretation of the date. It may take the form of focusing only on a certain dataset or influencing participants during data collection. 
+
+Exclusion bias --> The result of intentionally excluding specific subgroups
+from your study.
+
+Healthy user bias -> a higher focus on participants who are more active, healthy, and fit than most of the general population. 
+
+Berkson’s Fallacy -> the opposite of healthy user bias. In it, researchers only study participants who are very ill, causing an under-representation of healthy people. 
+
+*Correlation*
+
+Central limit theorem -> States that the sampling distribution of the mean of any independent, random variable will be normal or nearly normal, if the sample size is large enough. This means that if we take enough sample and they’re big enough, the proportions will be normally distributed around the mean. 
+
+Correlation --> Often used colloquially to refer to the idea that 2 variables
+are related to each other in some fashion. 
+
+  - It refers to the extent which two varibalse are dependent on eachother.
+  So, when we talk about 2 variables being correlated, we're saying that a change
+  in X coincides with a change in Y because of that dependence.
+  
+-	Features of correlation
+
+    o	Strength of correlation
+	Refers to how closely dependent 2 variables are. 
+•	You can have no correlation when there’s no dependence between 2 variables (change in x doesn’t have change in y). r=0.
+•	Perfect correlation when a linear equation perfectly describes the relationship between X and Y, such that all data points would appear on a line where X changes as Y changes. R = -1 or 1.
+•	You can also have low (0.3), medium (0.5) and high(0.7). 
+
+   o	Type of correlation
+   	Refers to whether the nature of the relationship between 2 variables. 
+•	A positive correlation indicates that a positive change in X gives a positive change in Y. It may range from -1 to a 1.
+
+•	Curvilinear correlation where the relationship isn’t defined by a straight line but rather some sort of curve (exponential relationship). It may oscillate between positive and negative (positive until a certain point and then negative).
+
+o	A pearson correlation coefficient wouldn’t be appropriate for this sort of relationship.
+
+•	Partial correlation where strong or moderate correlation until a certain point. Past that point the relationship weakens or become non-existent.
+
+Journalists overemphasize the possibility of causation without mentioning any disclaimers that the scholarly authors may have tried to highlight. It’s not always the journalists fault though
+.
+o	Some scholarly articles confuse correlation and causation, which then confuses journalists.
+
+o	Scholars don’t acknowledge how often they have used causal language, journalists need to be even more skeptical readers of research. If journalists fail to question scholars’ assertion of causation, readesr might ignore science journalism.
+
+*Scatterplot*
+
+Scatterplot  Shows the relationship between 2 quantitative variables measured for the same individuals. The values of one variable appear on the x-axis and the other values on the y-axis. Each individual in the data appears as a point on the graph.
+
+-	Many research projects use correlational studies because they investigate the relationships that may exist between variables.
+
+-	Meant to be used in great detail because there are usually hundreds of individuals in the data set.
+
+-	Purpose is to provide a general illustration of the relationship between the 2 variables.
+
+How to examine scatterplot
+-	Look for the overall pattern and for striking departures from that pattern.
+o	The overall pattern of a scatterplot can be described by the direction, form, and strength of the relationship.
+o	An important kind of departure is an outlier, an individual value that falls outside the overall pattern of the relationship. 
+
+-	A correlation coefficient measures the strength of that relationship.
+o	Correlation r measures the strength of the linear relationship between 2 quantitative values. 
+     	r is always a number between -1 and 1.
+     	r >0 indicates + association
+	    r <0 indicates – association.
+    	Values of r near 0 indicate a very weak linear relationship.
+   	  The strength of r near 0 indicate a very weak liner relationship.
+	    The strength of the linear relationship increases as r moves away from 0 toward -1 or 1.
+	    R = -1 and r = 1 occur only in the case of perfect linear relationship.
+	     R <0.3  none or very weak
+	    0.3 < r < 0.5  Weak
+	    0.5 <r< 0.7 moderate
+	    R > 0.7 strong relationship
+
+Correlation coefficients
+-	Correlation coefficients have a probability (p-value), which shows the probability that the relationship between the 2 variables is equal to 0 (null hypothesis; no relationship)
+-	Strong correlations have low p-values because the probability that they have no relationship is low.
+
+*QUIZ ANSWERS* 
+
+- What does it mean to score in the 90th percentile on a test? 
+  You scored higher than exactly 90% of the test takers.
+
+What is the interquartile range (IQR) and how is it calculated?
+- The range of the middle 50% of the data, calculated as Q3 minus Q1.
+
+Which of the following statements is true about a normal distribution?
+- It is symmetric on both sides of the mean. 
+
+In a normal distribution, approximately what percentage of data lies within two standard deviations of the mean?
+- 95
+
+Variance is important because people are more interested in things that aren't common and rare than the ordinary stuff. For example, people are going to be more interested in the variance between house insurance in different counties in California for earthquakes, if how much you are insured is different from everyone else. 
+
+A low standard deviation means that data is clustered around the mean, while
+a high standard deviation means that the data is close to the mean.
+
+What is sampling bias?
+- Bias that happens when a research study does not use a representative sample of the target population.
+
+What is a common challenge when using random sampling to survey small populations?
+- High costs due to the need for extensive screening interviews.
+
+What is the primary difference between a population and a sample in statistics?
+- A population includes all individuals or elements of interest, while a sample is a subset of the population chosen for analysis.
+
+How can researchers minimize sampling bias in their studies?
+By ensuring every individual in the population has an equal chance of being selected.
+
+Why is stratified sampling used in surveys?
+To ensure that key subgroups within the population are adequately represented in the sample.
+
+
+
+
