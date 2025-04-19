@@ -1,0 +1,122 @@
+---
+title: "Maryland Public School Absenteeism Project"
+Name: "Stella S. Canino"
+---
+ 
+ #Load library
+ 
+```{r}
+library(tidyverse)
+```
+
+#Loaded the data for absenteeism 
+
+```{r}
+absenteeism_2024 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2024.csv") #Post-pandemic
+absenteeism_2023 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2023.csv") #Post-pandemic
+absensteeism_2022 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2022.csv") #Pandemic
+absenteeism_2021 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2021.csv") #Pandemic
+absenteeism_2020 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2020.csv") #Pandemic
+absenteeism_2019 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2019.csv") #Pre-pandemic
+```
+
+**Notes from the data** April 19,2025
+
+The source of this data is the Maryland Report Card Website that is run by the state department of education.
+https://reportcard.msde.maryland.gov 
+
+Each of these datasets contains attendance and absence totals and percentages for every individual school in the county, for the entire district, and for the district broken down by elementary, middle, and high school levels.
+Each data set is divided by school year. The data also includes the complete total of the entire state, and the total Maryland numbers broken down by elementary, middle, and high school levels. 
+
+It encapsulates the entire school year. I have gathered the schools years of (2019-2024). I wanted to have a good mix of school years before COVID, during and after. 
+
+The most important columns for my analysis is the attendance rate, the county of days attended, chronic absenteeism county, chronic absenteeism percent, and chronic absentee denomination. These will help me measure the scope of schools with high and low chronic absenteeism. 
+
+The thing missing with this data is that it does not provide demographics of the individual schools and
+school districts, which is important for my hypothesis that POC students are more likely to be chronically absent and where they are in the state. 
+
+That demographic data I would have to extract it individually from schools, when I find the one with the top chronic absenteeism issue, and then county-wise with demographics. This would be done later once I figure out what are the top counties and schools with chronic absenteeism. 
+
+Questions:
+
+1. When I examined the data, there were some information inside the columns that had this mark (*). What does that mean? Is it just signifying that there's not available data?  What should I do?
+
+2. In attendance rate some of the info inside the column is this >= 95.0. What does this mean? How should interpret this when I start making statistical analysis?
+
+3. Some of the data sets is repetitive. For example, AACPS Virtual Academy is divided in both elementary, middle school and high school, and also has a separate row that includes all of their numbers. What should I do with data like this?
+
+4. Do you think that I will need to incorporate ANOVA, Chi-test or Regression at one point in this project? In what way will I do that?
+
+*Cleaning and viewing the data*
+
+```{r}
+glimpse(absenteeism_2024)
+glimpse(absenteeism_2023)
+glimpse(absensteeism_2022)
+glimpse(absenteeism_2021)
+glimpse(absenteeism_2020)
+glimpse(absenteeism_2019)
+
+#All of the data here has academic year as an interger, and the rest of the numbers as characters. I will be doing the change for this below. 
+
+```
+
+
+
+```{r}
+
+absenteeism_2024 <- absenteeism_2024 |>
+  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+
+absenteeism_2023 <- absenteeism_2023 |>
+  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+
+absensteeism_2022 <- absensteeism_2022 |>
+  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+
+absenteeism_2021 <- absenteeism_2021 |>
+  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+
+absenteeism_2020 <- absenteeism_2020 |>
+  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+
+absenteeism_2019 <- absenteeism_2019 |>
+  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+
+
+```
+
+#There's this column called create data AND LEA(LSS SAME THING) that doesn't have anything to do with my data so I'm just cleaning it up. 
+
+```{r}
+absenteeism_2024 <- absenteeism_2024 |>
+  select(-Create.Date, -LEA.Number)
+
+absenteeism_2023 <- absenteeism_2023 |>
+  select(-Create.Date, -LEA.Number)
+
+absensteeism_2022 <- absensteeism_2022 |>
+  select(-Create.Date, -LEA.Number)
+
+absenteeism_2021 <- absenteeism_2021 |>
+  select(-Create.Date, -LSS.Number)
+
+absenteeism_2020 <- absenteeism_2020 |>
+  select(-Create.Date, -LSS.Number)
+
+absenteeism_2019 <- absenteeism_2019 |>
+  select(-Create.Date, -LSS.Number)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
