@@ -329,21 +329,27 @@ if(nrow(extreme_outliers) > 0) {
 ### Task 6 (2 points)
 For the extreme outliers identified (z-scores beyond ±3), what do they have in common?
 
-All the extreme outliers have in common that they mostly occur on a Friday and Saturdays in all the years that are recorded.
+All the extreme outliers have in common that they mostly occur on a Friday and Saturdays.
 
 ## Your Best Story Pitch
 
 ### Task 7 (5 points)
-Based on all the analyses performed, craft your best story pitch, including a headline and lede. Be sure to include what kinds of sources/people you'd talk to for the story.
+Based on all the analyses performed, craft your best story pitch, including 
+a headline and lede. Be sure to include what kinds of sources/people you'd talk 
+to for the story.
 
 Headline: 
 
 
-Lede:  Accidents in Prince George's County are most likely to spike on Sundays, according to county level data from 2017 to April 2025 that tracked high accident counts.
+Lede:  Accidents in Prince George's County are most likely to spike on Sundays, 
+according to county level data from 2017 to April 2025 that tracked high accident counts.
 
 Sources:
 
-For this story, I would contact PGPD for comment on why Sundays, and what have they've done to mitigate it. I would look at police reports to also understand the nature of the accidents. I would also check the traffic data to see what are the busiest times during sunday, and have the police reports confirm it. 
+For this story, I would contact PGPD for comment on why Sundays, and what have
+they've done to mitigate it. I would look at police reports to also understand 
+the nature of the accidents. I would also check the traffic data to see what are
+the busiest times during sunday, and have the police reports confirm it. 
 
 
 
