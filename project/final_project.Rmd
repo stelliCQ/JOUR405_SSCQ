@@ -7,17 +7,18 @@ Name: "Stella S. Canino"
  
 ```{r}
 library(tidyverse)
+library(janitor)
 ```
 
 #Loaded the data for absenteeism 
 
 ```{r}
-absenteeism_2024 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2024.csv") #Post-pandemic
-absenteeism_2023 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2023.csv") #Post-pandemic
-absensteeism_2022 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2022.csv") #Pandemic
-absenteeism_2021 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2021.csv") #Pandemic
-absenteeism_2020 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2020.csv") #Pandemic
-absenteeism_2019 <- read.csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2019.csv") #Pre-pandemic
+absenteeism_2024 <- read_csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2024.csv") #Post-pandemic
+absenteeism_2023 <- read_csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2023.csv") #Post-pandemic
+absenteeism_2022 <- read_csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2022.csv") #Pandemic
+absenteeism_2021 <- read_csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2021.csv") #Pandemic
+absenteeism_2020 <- read_csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2020.csv") #Pandemic
+absenteeism_2019 <- read_csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2019.csv") #Pre-pandemic
 ```
 
 **Notes from the data** April 19,2025
@@ -52,7 +53,7 @@ Questions:
 ```{r}
 glimpse(absenteeism_2024)
 glimpse(absenteeism_2023)
-glimpse(absensteeism_2022)
+glimpse(absenteeism_2022)
 glimpse(absenteeism_2021)
 glimpse(absenteeism_2020)
 glimpse(absenteeism_2019)
@@ -61,28 +62,69 @@ glimpse(absenteeism_2019)
 
 ```
 
+ clean names 
+```{r} 
 
+absenteeism_2024 <- absenteeism_2024 |> clean_names()
+absenteeism_2023 <- absenteeism_2023 |> clean_names()
+absenteeism_2022 <- absenteeism_2022 |> clean_names()
+absenteeism_2021 <- absenteeism_2021 |> clean_names()
+absenteeism_2020 <- absenteeism_2020 |> clean_names()
+absenteeism_2019 <- absenteeism_2019 |> clean_names()
 
+```
+
+mutate to numbers
 ```{r}
 
-absenteeism_2024 <- absenteeism_2024 |>
-  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+absenteeism_2024 <- absenteeism_2024 |> 
+  mutate(across(
+    c(attend_rate_pct, days_attended_cnt, days_member_cnt,
+      fewer_5_pct, fewer_5_cnt, more_20_pct, more_20_cnt,
+      more_90_member_cnt, chronic_absentee_cnt, chronic_absentee_denom, chronic_absentee_pct
+    ),
+    as.numeric
+  ))
 
-absenteeism_2023 <- absenteeism_2023 |>
-  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+absenteeism_2023 <- absenteeism_2023 |> 
+  mutate(across(
+    c(attend_rate_pct, days_attended_cnt, days_member_cnt,
+      fewer_5_pct, fewer_5_cnt, more_20_pct,more_20_cnt,
+      more_90_member_cnt, chronic_absentee_cnt, chronic_absentee_denom, chronic_absentee_pct
+    ),
+    as.numeric
+  ))
 
-absensteeism_2022 <- absensteeism_2022 |>
-  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+absenteeism_2022 <- absenteeism_2022 |> 
+  mutate(across(
+    c( attend_rate_pct, days_attended_cnt, days_member_cnt,
+      fewer_5_pct, fewer_5_cnt, more_20_pct,more_20_cnt,
+      more_90_member_cnt, chronic_absentee_cnt, chronic_absentee_denom, chronic_absentee_pct ),
+    as.numeric))
 
-absenteeism_2021 <- absenteeism_2021 |>
-  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+absenteeism_2021 <- absenteeism_2023 |> 
+  mutate(across(
+    c( attend_rate_pct, days_attended_cnt, days_member_cnt,
+      fewer_5_pct, fewer_5_cnt, more_20_pct,more_20_cnt,
+      more_90_member_cnt, chronic_absentee_cnt, chronic_absentee_denom, chronic_absentee_pct),
+    as.numeric))
 
-absenteeism_2020 <- absenteeism_2020 |>
-  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
+absenteeism_2020 <- absenteeism_2020 |> 
+  mutate(across(
+    c(attend_rate_pct, days_attended_cnt, days_member_cnt,
+      fewer_5_pct, fewer_5_cnt, more_20_pct,more_20_cnt,
+      more_90_member_cnt, chronic_absentee_cnt, chronic_absentee_denom, chronic_absentee_pct
+    ), as.numeric))
 
-absenteeism_2019 <- absenteeism_2019 |>
-  mutate(across(c(Attend.Rate.Pct, Days.Attended.Cnt, Days.Member.Cnt, Fewer.5.Pct, Fewer.5.Cnt, More.20.Pct, More.20.Cnt, More.90.Member.Cnt,  Chronic.Absentee.Cnt, Chronic.Absentee.Denom, Chronic.Absentee.Pct), as.integer))
-
+absenteeism_2019 <- absenteeism_2023 |> 
+  mutate(across(
+    c(
+      attend_rate_pct, days_attended_cnt, days_member_cnt,
+      fewer_5_pct, fewer_5_cnt, more_20_pct,more_20_cnt,
+      more_90_member_cnt, chronic_absentee_cnt, chronic_absentee_denom, chronic_absentee_pct
+    ),
+    as.numeric
+  ))
 
 ```
 
@@ -90,24 +132,184 @@ absenteeism_2019 <- absenteeism_2019 |>
 
 ```{r}
 absenteeism_2024 <- absenteeism_2024 |>
-  select(-Create.Date, -LEA.Number)
+  select(-create_date, -lea_number)
 
 absenteeism_2023 <- absenteeism_2023 |>
-  select(-Create.Date, -LEA.Number)
+  select(-create_date, -lea_number)
 
-absensteeism_2022 <- absensteeism_2022 |>
-  select(-Create.Date, -LEA.Number)
+absenteeism_2022 <- absenteeism_2022 |>
+  select(-create_date, -lea_number)
 
 absenteeism_2021 <- absenteeism_2021 |>
-  select(-Create.Date, -LSS.Number)
+  select(-create_date, -lea_number)
 
 absenteeism_2020 <- absenteeism_2020 |>
-  select(-Create.Date, -LSS.Number)
+  select(-create_date, -lss_number)
 
 absenteeism_2019 <- absenteeism_2019 |>
-  select(-Create.Date, -LSS.Number)
+  select(-create_date, -lea_number)
 
 ```
+
+#Filter out non-numeric value. 
+
+```{r}
+absenteeism_2024 <- absenteeism_2024 |> filter(days_attended_cnt != "*")
+
+absenteeism_2023 <- absenteeism_2023 |> filter(days_attended_cnt != "*")
+                                               
+absenteeism_2022 <- absenteeism_2022 |> filter(days_attended_cnt != "*")                                           
+absenteeism_2021 <- absenteeism_2021 |> filter(days_attended_cnt != "*")
+
+absenteeism_2020 <- absenteeism_2020 |> filter(days_attended_cnt != "*")
+
+absenteeism_2019 <- absenteeism_2019 |> filter(days_attended_cnt != "*")
+
+```
+
+April 26, 2025 Final Project: The Test You Could Run
+
+Question: What does chronic_absentee_denom mean?
+
+I first started to check the preliminary output without any analysis about the
+data set. I'm just using 2019 and 2024 as a way to understand what I could 
+possibly expect from the tests I could do. 
+
+In 2019 and 2024, Baltimore City schools and Dorchester schools are still in the
+top 2 spots of districts with the highest chronic percent of absentee. This was
+code 4. 
+
+Achievement Academy at Harbor City High is the school with the highest
+chronic absenteeism in 2024, with 93.8%.
+
+Meadowood Education Center is the schools with the highest chronic absenteeism
+in 2019, with 94.2%
+
+High Point High has the highest Count of chronic absenteeism in 2024 with 1588.
+However, the chronic absenteeism rate is 47.6%.
+
+This means that there isn't a direct relation with rate and count. This means 
+that you could have the highest percentage of absenteeism, but not the highest 
+count.
+
+Question: For the test, what should I use for tests? The percentages or the 
+counts?
+
+Excel Academy at Francis M. Wood High has the lowest attendance rate with 44.2%
+in 2024. Interesting enough, the chronic absenteeism percent is NA. 
+
+Achievement Academy at Harbor City High had the lowest attendance rate with 33.8%. 
+Their chronic absenteeism percent is also shown NA.
+
+By ONLY looking at 2019 v. 2024, it looks like there is a decrease BUT that's 
+just comparing individual numbers.
+
+
+```{r}
+#This is my code to view what are schools in Maryland with the highest rate of chronic absenteeism. 
+#I wanted to see the difference between the percent and count.
+
+absenteeism_2024 |> filter(school_number != "A", school_type != "All") |> 
+  arrange(desc(chronic_absentee_pct))
+
+absenteeism_2024 |> filter(school_number != "A", school_type != "All") |> 
+  arrange(desc(chronic_absentee_cnt)) 
+
+absenteeism_2024 |> filter(school_number != "A", school_type != "All") |>
+  arrange((attend_rate_pct))
+
+absenteeism_2024 |> filter(school_number == "A", school_type == "All") |>
+  arrange((desc(chronic_absentee_pct)))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+absenteeism_2019 |> filter(school_number != "A", school_type != "All") |> 
+  arrange(desc(chronic_absentee_pct))
+
+absenteeism_2019 |> filter(school_number != "A", school_type != "All") |> 
+  arrange(desc(chronic_absentee_cnt)) 
+
+absenteeism_2019 |> filter(school_number != "A", school_type != "All") |>
+  arrange((attend_rate_pct))
+
+absenteeism_2019 |> filter(school_number == "A", school_type == "All") |>
+  arrange((desc(chronic_absentee_pct)))
+
+
+
+```
+
+Possible Tests:
+
+For my project, I wanted to see if the schools with the highest rate of 
+chronic absenteeism also have high rates of diversity. My hypothesis is that 
+schools with high percentages of diversity may also have high rates of 
+absenteeism. 
+
+Because, its not readily available to get the demographics data. I need to
+first find the schools that have the highest rate of chronic absenteeism.
+(I downloaded a lot of data, but I'm not sure if I can handle doing all of these
+tests for all of these dates. I might reduce it to one year or three years, so
+I don't overwork myself to oblivion.)
+
+I was thinking of gathering the top 50 to 100 schools with chronic absenteism.
+Then, once I got that find a way to incorporate the individual demographics data.
+
+Once I'm able to do that. I believe a linear regression because I'm going to 
+compare chronic absenteeism rate, and diversity rates for the schools. I want 
+to see if one predicts the other or is associated linearly. It's because we are 
+testing the relationship between 2 numeric variables. 
+
+I would say linear regression is the best option, but IDK if the other tests
+can also be used as well. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
