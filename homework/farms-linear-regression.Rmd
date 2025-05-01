@@ -107,9 +107,9 @@ The conclusion I got from the model's result is that in Montgomery County, speci
 
 In the case of the school board member and math scores, I would write a story that he is correct that schools with a low percentage of students in FARMS do have higher test scores. However, I would add in my pitch that this model is responding due to a wider issue: poverty. I would use as an example Wayside and Stedwick, same county, very different results. 
 
-We can assume that the parents of students in Wayside have enough financial resources to help their children succeed in math as well as give their taxes to fund the school better. In contrast, the parent's of Stedwick kids don't have the financial resources to give their children better opportunities with math and fund the school with their tax more. 
+We can assume that the parents of students in Wayside have enough financial resources to help their children succeed in math and give their taxes to fund the school better. In contrast, the parent's of Stedwick kids don't have the financial resources to give their children better opportunities with math and fund the school with their tax more. 
 
-The underlying theme of the pitch is that the test score results may be less about the actual neef for FARMS, but more about the economic conditions that students are in.  
+The underlying theme of the pitch is that the test score results may be less about FARMS, but more about the economic conditions that students are in.  
 
 
 Note to stella 
