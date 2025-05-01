@@ -1,0 +1,122 @@
+---
+title: "Identifying Schools with Biggest Differences in Math Test Scores, Part 2"
+author: "Stella S. Canino"
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+options(scipen = 999)
+```
+
+### Introduction
+
+We'll do what we did in class, but with a twist: instead of Montgomery County, Pa., you'll be working with data from Montgomery County, Md. Same basic idea, though: linear regression looking at free and reduced-price meals and math test scores.
+
+Just as in the exercise, you will create a scatterplot to visualize the relationship between the FARMS (Free and Reduced-price Meal System) percentage and the percentage of students who met or exceeded math expectations. You'll then use linear regression to identify the schools that show the biggest differences between their actual and expected math test scores and evaluate the results of your model.
+
+### Loading the Data
+
+First, let's load the data into a data frame using the read_csv() function from the tidyverse library.
+
+```{r}
+schools <- read_csv("https://raw.githubusercontent.com/dwillis/jour405_files/refs/heads/main/montgomery_md.csv")
+```
+### Task: Create a Scatterplot and Describe the Results (5 points)
+
+First, let's create a scatterplot to visualize the relationship between the FARMS percentage and the percentage of students who met or exceeded math expectations. We'll use ggplot2 to create the plot and add a linear regression line.
+
+```{r}
+schools |>
+  ggplot(aes(x = `FARMS Pct`, y = `% Met or Exceeded Math Expectations`)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(x = "FARMS Percentage", y = "% Met or Exceeded Math Expectations", title = "Scatterplot of Math Expectations vs FARMS Percentage")
+```
+Based on what you see here, what's the relationship between FARMS percentage and math test scores? Compare this scatterplot to the one you made in the class activity.
+
+In the previous assignment, the scatterplot of Pennsylvania County showed no relationship. This scatterplot shows that the higher the math score expectations the lower the percentage of students on free or reduced meals. This scatterplot shows a negative relationship.
+
+
+### Task: Linear Regression Model (7 points)
+
+Next, you'll perform a linear regression analysis using the lm() function. We'll set the percentage of students who met or exceeded math expectations as the dependent variable, and the FARMS percentage as the independent variable. In other words, if we know the FARMS percentage for a school, how reliably can we predict its math score?
+
+```{r}
+model <- lm(`% Met or Exceeded Math Expectations` ~ `FARMS Pct`, data = schools)
+
+summary(model)
+```
+
+Provide the model's output for the three statistics mentioned in the class activity.
+
+A. The p-value is 2.2 x 10^-16.
+B.The adjusted R-square is 0.6734
+C. The residual's minimum is -28.08 and the max is 29.99. 
+
+Based on what you've learned so far, what does it tell us about the nature of the relationship between FARMS percentage and math scores? Is this model worth exploring further? Why or why not?
+
+The output from these 3 statistics tools tells us that the model is worth
+exploring. This is due that the p-value is very small, which indicates that there is a very small chance that this was due to random chance. Secondly, the R-square says that 67% of the model can explain that the variance in the dependent variable can be explained with the independent variable. It's important to note
+that the residuals are decently big so we do have to have that in mind. 
+
+### Task: Identifying Schools with Biggest Residuals (3 points)
+
+Let's calculate and examine the residuals next. 
+
+```{r}
+schools$predicted <- predict(model)
+
+# Calculate the residuals
+schools <- schools |> 
+  mutate(residual = `% Met or Exceeded Math Expectations` - predicted)
+
+# Sort the data frame by the absolute value of the residuals in descending order
+schools <- schools |>
+  mutate(abs_residual = abs(residual)) |>
+  arrange(desc(abs_residual))
+
+```
+
+Look at the absolute values of the residuals; what are the largest differences between the predicted result and the actual math scores?
+
+Pick two schools with the largest residuals.Find the zip codes where they are located and using the CensusReporter.org website, describe the most interesting demographic data from each zip code.
+
+Stedwick absolute residual is 55%,and the model predicted +63%; it had -55%.Wayside elementary is 56% absolute residual, and the model predicted +25%, and it actually had +56%.
+
+The schools with the largest residuals are Wayside Elementary (zip code: 20854) and Stedwick Elementary (zip code: 20886). 
+
+Both schools are located in Montgomery County. The most interesting demographic data is that Stedwick Elementary zip code has a median household income of 89K, with a majority Hispanic population. Wayside Elementary zip code has a median household income of 250K with its population being 71% White. 
+
+====================== (Notes de Stella)
+Zip code: 20886
+- It's 35% Hispanic, 23% Black, 23% White, and 14% Asian.
+- 11% live below the poverty line. 
+- The median household income is $89,000.
+
+Zip code: 20854
+- The county is 71% White, 12% Asian and 8% Hispanic, 5% Black
+- 5% live below the poverty line. 
+- Median household income is $250K.
+==================================
+## Task: Evaluate the model (5 points)
+
+Describe what conclusions you'd draw from this model's results and how it would influence a story pitch about the school board member and math scores.
+
+The conclusion I got from the model's result is that in Montgomery County, specifically, the higher the percentage of FARMS for students the lower the possibility of high math test scores. This is statistically significant result. 
+
+In the case of the school board member and math scores, I would write a story that he is correct that schools with a low percentage of students in FARMS do have higher test scores. However, I would add in my pitch that this model is responding due to a wider issue: poverty. I would use as an example Wayside and Stedwick, same county, very different results. 
+
+We can assume that the parents of students in Wayside have enough financial resources to help their children succeed in math as well as give their taxes to fund the school better. In contrast, the parent's of Stedwick kids don't have the financial resources to give their children better opportunities with math and fund the school with their tax more. 
+
+The underlying theme of the pitch is that the test score results may be less about the actual neef for FARMS, but more about the economic conditions that students are in.  
+
+
+Note to stella 
+
+- Basically what happens in PR. if u have 68% poverty rate in caguas, there's no money to also get tutoring or after-class help.
+
+
+
+
+
