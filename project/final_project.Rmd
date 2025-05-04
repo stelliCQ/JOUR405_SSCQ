@@ -8,6 +8,8 @@ Name: "Stella S. Canino"
 ```{r}
 library(tidyverse)
 library(janitor)
+library(knitr)      # For nice tables
+library(lubridate) 
 ```
 
 #Loaded the data for absenteeism 
@@ -280,21 +282,171 @@ testing the relationship between 2 numeric variables.
 I would say linear regression is the best option, but IDK if the other tests
 can also be used as well. 
 
+------------------------------------------------------
+
+find means. SD, z-score
+- URL 
+
+Try to apply some of the code that we've used to your data to actually run some of those tests. See how far you get. When you run into errors - and that's absolutely the goal here - try to figure out what the error messages mean, through searching the web. If you use AI for this, you must create a share link and include the link in your notebook.
+
+For any results that you're able to generate, tell me what you think they say in the notebook. Again, the more detail, the higher your grade.
+
+**Trials, Errors and Lessons**
+
+* I joined all of my datasets but when I try to search 2019 on "total" it doesn't show up. However, I know the data was inputed because when i deleted the 2019 dataset from the join the numbers decrease.
+- What's going on here?
+
+Also, when I did the SD and mean 2021 showed up with NaN response. I couldn't do Mean or SD of 2019 due to problem listed above. 
+
+#The TOTAL mean is 33.439%, and 17.11256 is the standard deviation.
+#The 2020 mean is 27.3189 and SD 15.66334	
+#The 2022 mean 37.80146	and SD 17.57472	
+#The 2023 mean 34.04564	and SD 17.02846	
+#The 2024 mean 31.77588	and SD 16.47358	
+
+This means that most schools tend to be between +17% or -17% from the mean.
+
+*From viewing the different emans we see that the mean abesenteeism has gone up. 
+
+```{r}
+#combinar la data
+#LOOK AT JOUR472 HW 4 or 5??
+
+total <- bind_rows(absenteeism_2024, absenteeism_2023, absenteeism_2022, absenteeism_2021, absenteeism_2020, absenteeism_2019)
+
+glimpse(total)
+
+```
+
+You should combine all six years into a single dataframe so you can do overall means/std dev (you can still do year-by-by using group_by(year). And you should use janitor to make the column names easier to work with.
+
+I would use the rates, not the counts, for your metrics here because school sizes vary.
+Regression will be useful, and so might z-scores to find the outliers. Start with means/sd, make some scatterplots.
+
+```{r}
+##Look for total mean, standard deviation. Then also check for the year-by-year one. 
+
+#I'm looking at the chronic absenteeism percentage
+#How to do it with columns is in JOUR472 github???? 
+total |> 
+  summarise(
+    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+total |> 
+  summarise(
+    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
+  )
+
+
+```
+```{r}
+total |> 
+  filter(academic_year == "2021") |> 
+  summarise(
+    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+total |> 
+  filter(academic_year == "2020") |> 
+  summarise(
+    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
+  )
+```
+```{r}
+total |> 
+  filter(academic_year == "2022") |> 
+  summarise(
+    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
+  )
+```
+
+```{r}
+total |> 
+  filter(academic_year == "2023") |> 
+  summarise(
+    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+total |> 
+  filter(academic_year == "2024") |> 
+  summarise(
+    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
+  )
+```
+
+Z-SCORE TEST
+
+a. This is the actual test.
+
+```{r}
+total <- total |>
+  mutate(
+    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE),
+    z_score = (chronic_absentee_pct - mean_chronic_absent) / sd_chronic_absent
+  )
+```
+
+b. This is where we view it. 
+
+```{r}
+outlier <- total |>
+  filter(school_number != "A", school_type != "All") |>
+  filter(abs(z_score) > 2) |>
+  select(academic_year, school_name, school_type, z_score) |>
+  arrange(desc(z_score))
 
 
 
+```
 
+Z-SCORE EXTREME TEST
 
+```{r}
+extreme_outliers <- total |>
+  filter(school_number != "A", school_type != "All") |>
+  filter(abs(z_score) > 3) |>
+  arrange(desc(abs(z_score)))
 
+```
 
+These are the top schools that have high z-scores >3
 
+1. Meadowood Education Center in 2023
+2. Renaissance Academy in 2022
+3.Achievement Academy at Harbor City High in 2024
+4.Excel Academy at Francis M. Wood High in 2022
 
+*All of these are in Baltimore County and Baltimore City.
 
+To Derek:
 
+- I did the Z-score test and was able to see what schools are the worst in range of absenteeism. 
 
+- I would not say that I have completely proven that absenteeism has increased in Md public schools, but I'm getting there.
 
+- There are 412 outliers from individual schools and 85 are extreme outliers. 
 
+- Now we have a number of the schools that can be possibly used to see about the ethnicity thing originally.
 
+*I have not been able to completely prove that absenteeism has increased* I'm on my way to do it, but what should I do to prove it then?
 
 
 
