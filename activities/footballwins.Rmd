@@ -88,8 +88,7 @@ Without using the words "multiple regression model", describe how you could use 
 
 *This is based on a new model from the yards allowed, giveaways, and points scored shown in class*
 
-I would use the model to compare the points scored, giveaways and yards allowed would end up with wins in 
-the gameby a conference. 
+I would use the model to compare the points scored, giveaways and yards allowed would end up with wins in games by a conference. 
 
 
 
