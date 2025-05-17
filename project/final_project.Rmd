@@ -5,6 +5,13 @@ Name: "Stella S. Canino"
  
  #Load library
  
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      fig.width = 10, fig.height = 6)
+```
+
+
 ```{r}
 library(tidyverse)
 library(janitor)
@@ -104,7 +111,7 @@ absenteeism_2022 <- absenteeism_2022 |>
       more_90_member_cnt, chronic_absentee_cnt, chronic_absentee_denom, chronic_absentee_pct ),
     as.numeric))
 
-absenteeism_2021 <- absenteeism_2023 |> 
+absenteeism_2021 <- absenteeism_2021 |> 
   mutate(across(
     c( attend_rate_pct, days_attended_cnt, days_member_cnt,
       fewer_5_pct, fewer_5_cnt, more_20_pct,more_20_cnt,
@@ -118,7 +125,7 @@ absenteeism_2020 <- absenteeism_2020 |>
       more_90_member_cnt, chronic_absentee_cnt, chronic_absentee_denom, chronic_absentee_pct
     ), as.numeric))
 
-absenteeism_2019 <- absenteeism_2023 |> 
+absenteeism_2019 <- absenteeism_2019 |> 
   mutate(across(
     c(
       attend_rate_pct, days_attended_cnt, days_member_cnt,
@@ -143,13 +150,13 @@ absenteeism_2022 <- absenteeism_2022 |>
   select(-create_date, -lea_number)
 
 absenteeism_2021 <- absenteeism_2021 |>
-  select(-create_date, -lea_number)
+  select(-create_date, -lss_number)
 
 absenteeism_2020 <- absenteeism_2020 |>
   select(-create_date, -lss_number)
 
 absenteeism_2019 <- absenteeism_2019 |>
-  select(-create_date, -lea_number)
+  select(-create_date, -lss_number)
 
 ```
 
@@ -226,21 +233,6 @@ absenteeism_2024 |> filter(school_number == "A", school_type == "All") |>
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
 absenteeism_2019 |> filter(school_number != "A", school_type != "All") |> 
   arrange(desc(chronic_absentee_pct))
@@ -309,10 +301,26 @@ This means that most schools tend to be between +17% or -17% from the mean.
 *From viewing the different emans we see that the mean abesenteeism has gone up. 
 
 ```{r}
+#CHANGED SO ITS MORE CONCISE. 
+absenteeism_2020 <- absenteeism_2020 %>%
+  rename(lea_name = lss_name)
+
+absenteeism_2021 <- absenteeism_2021 %>%
+  rename(lea_name = lss_name)
+
+absenteeism_2019 <- absenteeism_2019 %>%
+  rename(lea_name = lss_name)
+
+```
+
+
+```{r}
 #combinar la data
 #LOOK AT JOUR472 HW 4 or 5??
 
 total <- bind_rows(absenteeism_2024, absenteeism_2023, absenteeism_2022, absenteeism_2021, absenteeism_2020, absenteeism_2019)
+
+
 
 glimpse(total)
 
@@ -442,20 +450,56 @@ To Derek:
 
 - I would not say that I have completely proven that absenteeism has increased in Md public schools, but I'm getting there.
 
-- There are 412 outliers from individual schools and 85 are extreme outliers. 
+- There are 394 outliers from individual schools and 71 are extreme outliers. 
 
 - Now we have a number of the schools that can be possibly used to see about the ethnicity thing originally.
 
 *I have not been able to completely prove that absenteeism has increased* I'm on my way to do it, but what should I do to prove it then?
 
+MAY 17, 2024
+
+DEREK SUGGESTION! 
+This is good stuff, and your z-scores work in particular are leading you to some excellent ideas. My suggestions:
+
+Regression - you've got chronic absentee percentage and can do see to what extend you can predict that using other variables like attend_rate_pct.
+ANOVA - you can do an ANOVA test using the chronic absentee pct and school type, but you want to use an average instead of each absentee pct. So you'd do something like this:
+https://gist.github.com/dwillis/f0131c4b0709322dad6b5d49d54280d0
+and then use the avg_chronic_absent in your ANOVA test and follow up with a TukeyHSD test to see the differences between school types. (DOING THIS!)
+
+ANOVA TEST
+
+```{r}
+school_averages <- total |>
+  group_by(school_name, lea_name, school_type) |>
+  summarize(
+    avg_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  filter(
+    !is.na(avg_chronic_absent),
+    !school_type %in% c("All", "All Students")
+  )
+```
 
 
+```{r}
+period_anova <- aov(avg_chronic_absent ~ school_type, data = school_averages)
+summary(period_anova)
+```
 
 
+```{r}
+tukey_results <- TukeyHSD(period_anova)
+print(tukey_results)
+```
 
+RESULTS
 
+High schools have on average 11.86 percentage points higher chronic absenteeism than elementary schools. This is statistically significant.
 
+Middle schools also have higher chronic absenteeism than elementary schools — by about 5.14 percentage points.
 
+**This pattern is statistically significant across all pairwise comparisons. I have solid evidence that chronic absenteeism increases with school level.** AKA older students skip instead of it being that elementatry school kids don't go to school bc parents cant take them there or something. 
 
 
 
