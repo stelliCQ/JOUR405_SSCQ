@@ -3,14 +3,26 @@ title: "Maryland Public School Absenteeism Project"
 Name: "Stella S. Canino"
 ---
  
- #Load library
+Introduction:
+ In recent years, the rate of absenteeism and chronic absenteeism has increased 
+ in the United States. Maryland is not an exemption. The purpose of this 
+ statistical analysis is to figure out how absenteeism and chronic absenteeism
+ is looking  in the state by viewing 2019-2024 school year data
+ provided from the Maryland Department of Education database.
+ Each of these datasets contains attendance and absence totals and percentages for every individual school
+ in the county, for the entire district, and for the district broken down by elementary, middle, and high school levels.
+
+ We will see who are the schools with the highest levels of absenteeism from 
+ this data set and determine their characteristics. 
  
+ Step 1: Input of data and cleaning
  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
                       fig.width = 10, fig.height = 6)
 ```
 
+# I am loading the libraries and absenteeism datasets. 
 
 ```{r}
 library(tidyverse)
@@ -18,8 +30,6 @@ library(janitor)
 library(knitr)      # For nice tables
 library(lubridate) 
 ```
-
-#Loaded the data for absenteeism 
 
 ```{r}
 absenteeism_2024 <- read_csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2024.csv") #Post-pandemic
@@ -30,34 +40,7 @@ absenteeism_2020 <- read_csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance
 absenteeism_2019 <- read_csv("~/Documents/GitHub/JOUR405_SSCQ/project/Attendance_2019.csv") #Pre-pandemic
 ```
 
-**Notes from the data** April 19,2025
-
-The source of this data is the Maryland Report Card Website that is run by the state department of education.
-https://reportcard.msde.maryland.gov 
-
-Each of these datasets contains attendance and absence totals and percentages for every individual school in the county, for the entire district, and for the district broken down by elementary, middle, and high school levels.
-Each data set is divided by school year. The data also includes the complete total of the entire state, and the total Maryland numbers broken down by elementary, middle, and high school levels. 
-
-It encapsulates the entire school year. I have gathered the schools years of (2019-2024). I wanted to have a good mix of school years before COVID, during and after. 
-
-The most important columns for my analysis is the attendance rate, the county of days attended, chronic absenteeism county, chronic absenteeism percent, and chronic absentee denomination. These will help me measure the scope of schools with high and low chronic absenteeism. 
-
-The thing missing with this data is that it does not provide demographics of the individual schools and
-school districts, which is important for my hypothesis that POC students are more likely to be chronically absent and where they are in the state. 
-
-That demographic data I would have to extract it individually from schools, when I find the one with the top chronic absenteeism issue, and then county-wise with demographics. This would be done later once I figure out what are the top counties and schools with chronic absenteeism. 
-
-Questions:
-
-1. When I examined the data, there were some information inside the columns that had this mark (*). What does that mean? Is it just signifying that there's not available data?  What should I do?
-
-2. In attendance rate some of the info inside the column is this >= 95.0. What does this mean? How should interpret this when I start making statistical analysis?
-
-3. Some of the data sets is repetitive. For example, AACPS Virtual Academy is divided in both elementary, middle school and high school, and also has a separate row that includes all of their numbers. What should I do with data like this?
-
-4. Do you think that I will need to incorporate ANOVA, Chi-test or Regression at one point in this project? In what way will I do that?
-
-*Cleaning and viewing the data*
+#Here I'm viewing the data to determines the columns, rows and outputs presented.
 
 ```{r}
 glimpse(absenteeism_2024)
@@ -68,22 +51,25 @@ glimpse(absenteeism_2020)
 glimpse(absenteeism_2019)
 
 #All of the data here has academic year as an interger, and the rest of the numbers as characters. I will be doing the change for this below. 
-
 ```
 
- clean names 
-```{r} 
+#Here I'm standarizing the names of the columns for all the datasets so it's 
+easier for me to type it out and all have the same format.
 
+```{r} 
 absenteeism_2024 <- absenteeism_2024 |> clean_names()
 absenteeism_2023 <- absenteeism_2023 |> clean_names()
 absenteeism_2022 <- absenteeism_2022 |> clean_names()
 absenteeism_2021 <- absenteeism_2021 |> clean_names()
 absenteeism_2020 <- absenteeism_2020 |> clean_names()
 absenteeism_2019 <- absenteeism_2019 |> clean_names()
-
 ```
 
-mutate to numbers
+# When I downloaded the 6 datasets values that are supposed to be numeric 
+ended up being viewed as characters. I proceeded to mutate the corresponding
+columns to numerical. This method of using the function across. I learned
+in JOUR472 last semester. 
+
 ```{r}
 
 absenteeism_2024 <- absenteeism_2024 |> 
@@ -134,10 +120,30 @@ absenteeism_2019 <- absenteeism_2019 |>
     ),
     as.numeric
   ))
-
 ```
 
-#There's this column called create data AND LEA(LSS SAME THING) that doesn't have anything to do with my data so I'm just cleaning it up. 
+Now that I have transformed my columns to numerical ones. I need to filter
+out values that don't have numbers. I do this because if I don't it might
+jam or make difficult building statistical models and analysis in R. 
+I used the filter function.
+
+```{r}
+absenteeism_2024 <- absenteeism_2024 |> filter(days_attended_cnt != "*")
+
+absenteeism_2023 <- absenteeism_2023 |> filter(days_attended_cnt != "*")
+                                               
+absenteeism_2022 <- absenteeism_2022 |> filter(days_attended_cnt != "*")                                           
+absenteeism_2021 <- absenteeism_2021 |> filter(days_attended_cnt != "*")
+
+absenteeism_2020 <- absenteeism_2020 |> filter(days_attended_cnt != "*")
+
+absenteeism_2019 <- absenteeism_2019 |> filter(days_attended_cnt != "*")
+```
+
+These are columns in my 6 datasets that don't provide any important information 
+to my analysis. I decided that eliminating from my analysis in R would help me
+be more time-efficient with my analysis. I do this by selecting create_date and 
+lea_number and using the - to tell R I don't wanna see this no more. 
 
 ```{r}
 absenteeism_2024 <- absenteeism_2024 |>
@@ -157,73 +163,88 @@ absenteeism_2020 <- absenteeism_2020 |>
 
 absenteeism_2019 <- absenteeism_2019 |>
   select(-create_date, -lss_number)
-
 ```
 
-#Filter out non-numeric value. 
+#In my data set LEA and LSS is the name of the county/school district an individual
+school belongs too. The name changed and means the same thing in all the datasets.
+I decided to make my columns more consistent by renaming. 
 
 ```{r}
-absenteeism_2024 <- absenteeism_2024 |> filter(days_attended_cnt != "*")
+#CHANGED SO ITS MORE CONCISE. 
+absenteeism_2020 <- absenteeism_2020 |>
+  rename(lea_name = lss_name)
 
-absenteeism_2023 <- absenteeism_2023 |> filter(days_attended_cnt != "*")
-                                               
-absenteeism_2022 <- absenteeism_2022 |> filter(days_attended_cnt != "*")                                           
-absenteeism_2021 <- absenteeism_2021 |> filter(days_attended_cnt != "*")
+absenteeism_2021 <- absenteeism_2021 |>
+  rename(lea_name = lss_name)
 
-absenteeism_2020 <- absenteeism_2020 |> filter(days_attended_cnt != "*")
-
-absenteeism_2019 <- absenteeism_2019 |> filter(days_attended_cnt != "*")
-
+absenteeism_2019 <- absenteeism_2019 |> 
+  rename(lea_name = lss_name)
 ```
 
-April 26, 2025 Final Project: The Test You Could Run
+**STATISTICAL ANALYSIS SECTION**
 
-Question: What does chronic_absentee_denom mean?
+Initial Analysis. Before performing statistical tests like ANOVA and
+Z-Score, I wanted to make initial calculations on my datasets separately to get
+an idea on what the outputs and results are being manifested by viewing data
+from 2019 (pre-pandemic) and 2024 (post-pandemic). 
 
-I first started to check the preliminary output without any analysis about the
-data set. I'm just using 2019 and 2024 as a way to understand what I could 
-possibly expect from the tests I could do. 
+This is the 2019 and 2024 absenteeism dataset. I filtered A and All. A represents
+the entire aggregate of the school district itself and also by school type
+(elementary, middle, and high school). A is different because it specifically 
+targets schools that has all three school types or 2. I did this because
+I wanted to focus every school individually by type. Having all the 
+aggregate data would have given me a false result. 
 
-In 2019 and 2024, Baltimore City schools and Dorchester schools are still in the
-top 2 spots of districts with the highest chronic percent of absentee. This was
-code 4. 
+I also analyzed this separately to see what school districts have the largest
+chronic absentee percentage.
 
-Achievement Academy at Harbor City High is the school with the highest
-chronic absenteeism in 2024, with 93.8%.
+#1A
+Important Result: The school districts with the highest rate of chronic
+absenteeism in Maryland are: Baltimore City High Schools (60.8%), All Baltimore City Schools (42.5%),
+All Cecil High Schools (35.9%), All Baltimore City Elementary Schools	(35.1%),
+and All Baltimore City High Schools (34.1%)
 
-Meadowood Education Center is the schools with the highest chronic absenteeism
-in 2019, with 94.2%
+Conclusion: Baltimore City tops the list for most chronic absenteeism. 
 
-High Point High has the highest Count of chronic absenteeism in 2024 with 1588.
-However, the chronic absenteeism rate is 47.6%.
+```{r}
+#1A
+absenteeism_2019 |> filter(school_number == "A") |>
+  arrange((desc(chronic_absentee_pct)))
 
-This means that there isn't a direct relation with rate and count. This means 
-that you could have the highest percentage of absenteeism, but not the highest 
-count.
+```
+#2A
 
-Question: For the test, what should I use for tests? The percentages or the 
-counts?
+The school with the highest amount of chronic absenteeism in 2019 is 
+Renaissance Academy in Baltimore City. Then its Frederick Douglass High in Baltimore City and Green Valley Academy at Edgar Allan Poe (high school and middle school) in PG County. In the lists, it tends to be Baltimore City that tops the list with PG County and Baltimore County following.
 
-Excel Academy at Francis M. Wood High has the lowest attendance rate with 44.2%
-in 2024. Interesting enough, the chronic absenteeism percent is NA. 
+```{r}
+#2A
+absenteeism_2019 |> filter(school_number != "A", school_type != "All Students") |> 
+  arrange(desc(chronic_absentee_pct))
 
-Achievement Academy at Harbor City High had the lowest attendance rate with 33.8%. 
-Their chronic absenteeism percent is also shown NA.
+#I did this one just to see the schools that have the highest attendance rate.
+#I just wanted to see
+absenteeism_2019 |> filter(school_number != "A", school_type != "All Students") |>
+  arrange(desc(attend_rate_pct))
+           
+```
+#3A
 
-By ONLY looking at 2019 v. 2024, it looks like there is a decrease BUT that's 
-just comparing individual numbers.
+In school district Baltimore City tops the list for most chronic absenteeism
+with 48.7%, Dorchester (38.3%), Allegany (36.4) and Somerset (33.5). 
 
+In 2024, Achievement Academy at Harbor City High, Joseph C. Briscoe Academy,	Meadowood Education Center are the schools with the highest rates of absenteeism.
+All are in Baltimore City.
 
 ```{r}
 #This is my code to view what are schools in Maryland with the highest rate of chronic absenteeism. 
-#I wanted to see the difference between the percent and count.
 
+#3A
 absenteeism_2024 |> filter(school_number != "A", school_type != "All") |> 
   arrange(desc(chronic_absentee_pct))
 
-absenteeism_2024 |> filter(school_number != "A", school_type != "All") |> 
-  arrange(desc(chronic_absentee_cnt)) 
-
+#I did this one just to see the schools that have the highest attendance rate.
+#I just wanted to see
 absenteeism_2024 |> filter(school_number != "A", school_type != "All") |>
   arrange((attend_rate_pct))
 
@@ -232,87 +253,11 @@ absenteeism_2024 |> filter(school_number == "A", school_type == "All") |>
 
 ```
 
+Step 3: Standard Deviation and Mean of the entire dataset
 
-```{r}
-absenteeism_2019 |> filter(school_number != "A", school_type != "All") |> 
-  arrange(desc(chronic_absentee_pct))
-
-absenteeism_2019 |> filter(school_number != "A", school_type != "All") |> 
-  arrange(desc(chronic_absentee_cnt)) 
-
-absenteeism_2019 |> filter(school_number != "A", school_type != "All") |>
-  arrange((attend_rate_pct))
-
-absenteeism_2019 |> filter(school_number == "A", school_type == "All") |>
-  arrange((desc(chronic_absentee_pct)))
-
-
-
-```
-
-Possible Tests:
-
-For my project, I wanted to see if the schools with the highest rate of 
-chronic absenteeism also have high rates of diversity. My hypothesis is that 
-schools with high percentages of diversity may also have high rates of 
-absenteeism. 
-
-Because, its not readily available to get the demographics data. I need to
-first find the schools that have the highest rate of chronic absenteeism.
-(I downloaded a lot of data, but I'm not sure if I can handle doing all of these
-tests for all of these dates. I might reduce it to one year or three years, so
-I don't overwork myself to oblivion.)
-
-I was thinking of gathering the top 50 to 100 schools with chronic absenteism.
-Then, once I got that find a way to incorporate the individual demographics data.
-
-Once I'm able to do that. I believe a linear regression because I'm going to 
-compare chronic absenteeism rate, and diversity rates for the schools. I want 
-to see if one predicts the other or is associated linearly. It's because we are 
-testing the relationship between 2 numeric variables. 
-
-I would say linear regression is the best option, but IDK if the other tests
-can also be used as well. 
-
-------------------------------------------------------
-
-find means. SD, z-score
-- URL 
-
-Try to apply some of the code that we've used to your data to actually run some of those tests. See how far you get. When you run into errors - and that's absolutely the goal here - try to figure out what the error messages mean, through searching the web. If you use AI for this, you must create a share link and include the link in your notebook.
-
-For any results that you're able to generate, tell me what you think they say in the notebook. Again, the more detail, the higher your grade.
-
-**Trials, Errors and Lessons**
-
-* I joined all of my datasets but when I try to search 2019 on "total" it doesn't show up. However, I know the data was inputed because when i deleted the 2019 dataset from the join the numbers decrease.
-- What's going on here?
-
-Also, when I did the SD and mean 2021 showed up with NaN response. I couldn't do Mean or SD of 2019 due to problem listed above. 
-
-#The TOTAL mean is 33.439%, and 17.11256 is the standard deviation.
-#The 2020 mean is 27.3189 and SD 15.66334	
-#The 2022 mean 37.80146	and SD 17.57472	
-#The 2023 mean 34.04564	and SD 17.02846	
-#The 2024 mean 31.77588	and SD 16.47358	
-
-This means that most schools tend to be between +17% or -17% from the mean.
-
-*From viewing the different emans we see that the mean abesenteeism has gone up. 
-
-```{r}
-#CHANGED SO ITS MORE CONCISE. 
-absenteeism_2020 <- absenteeism_2020 %>%
-  rename(lea_name = lss_name)
-
-absenteeism_2021 <- absenteeism_2021 %>%
-  rename(lea_name = lss_name)
-
-absenteeism_2019 <- absenteeism_2019 %>%
-  rename(lea_name = lss_name)
-
-```
-
+I combined all of the datasets to bind rows so I can make analysis 
+with all the data collected about the general relationship with absenteeism
+in all the 6 school years.
 
 ```{r}
 #combinar la data
@@ -320,16 +265,12 @@ absenteeism_2019 <- absenteeism_2019 %>%
 
 total <- bind_rows(absenteeism_2024, absenteeism_2023, absenteeism_2022, absenteeism_2021, absenteeism_2020, absenteeism_2019)
 
-
-
 glimpse(total)
-
 ```
 
-You should combine all six years into a single dataframe so you can do overall means/std dev (you can still do year-by-by using group_by(year). And you should use janitor to make the column names easier to work with.
-
-I would use the rates, not the counts, for your metrics here because school sizes vary.
-Regression will be useful, and so might z-scores to find the outliers. Start with means/sd, make some scatterplots.
+I wanted to see what is the average and standard deviation of the percentage
+of the chronic absenteeism. The results I received is a mean of 33.42 and 
+an SD of 17.42. 
 
 ```{r}
 ##Look for total mean, standard deviation. Then also check for the year-by-year one. 
@@ -343,25 +284,20 @@ total |>
   )
 ```
 
+Because a 33% mean is a relatively small number, I wanted to view the individual school years average to see if there are differences with some years going up 
+and some going down. 
+
+Results: It seems that chronic absenteeism increased from 2021 and 2024, but is
+starting to recover back to pre-pandemic levels.
 
 ```{r}
 total |> 
-  summarise(
-    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
-    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
-  )
-
-
-```
-```{r}
-total |> 
-  filter(academic_year == "2021") |> 
+  filter(academic_year == "2019") |> 
   summarise(
     mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
     sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
   )
 ```
-
 
 ```{r}
 total |> 
@@ -371,6 +307,16 @@ total |>
     sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
   )
 ```
+
+```{r}
+total |> 
+  filter(academic_year == "2021") |> 
+  summarise(
+    mean_chronic_absent = mean(chronic_absentee_pct, na.rm = TRUE),
+    sd_chronic_absent = sd(chronic_absentee_pct, na.rm = TRUE)
+  )
+```
+
 ```{r}
 total |> 
   filter(academic_year == "2022") |> 
@@ -389,7 +335,6 @@ total |>
   )
 ```
 
-
 ```{r}
 total |> 
   filter(academic_year == "2024") |> 
@@ -399,9 +344,16 @@ total |>
   )
 ```
 
-Z-SCORE TEST
+STEP 4: Z-SCORE TEST
 
-a. This is the actual test.
+I'm using the Z-Score test because it will help me determine if there is a 
+significant difference between the general mean of my population and the chronic
+absentee percentage of each school. This will help me find the outliers of my 
+dataset, which means it's the schools that have the highest variation from the
+mean. The outliers will be the schools with the largest chronic absentees. 
+
+This is the general Z-score test. When you open the chart now in the open
+environment. You see the Z-Score of every single school in the past 6 school years.
 
 ```{r}
 total <- total |>
@@ -412,7 +364,12 @@ total <- total |>
   )
 ```
 
-b. This is where we view it. 
+Now, I want to see the outliers and extreme outliers of my dataset. This is to view
+which are the schools that have the highest rate of chronic absenteeism compared
+to the rest of the dataset. The point of my analysis is to find the schools
+with high number of absenteeism. 
+
+There are 394 outliers from all 6 school years in the total dataset. This is from the range of 2-3 Z-scores. My main focus is the extreme outliers, but to get to that I have to first find the general outliers. 
 
 ```{r}
 outlier <- total |>
@@ -420,12 +377,13 @@ outlier <- total |>
   filter(abs(z_score) > 2) |>
   select(academic_year, school_name, school_type, z_score) |>
   arrange(desc(z_score))
-
-
-
 ```
 
-Z-SCORE EXTREME TEST
+This is the Z-score extreme outliers test. 
+
+There are 71 extreme outliers in the entire data set. The school that are the biggest outliers are Northeast EDLP at Parkville High School in 2021, Meadowood Education Center in 2021 and 2023, Renaissance Academy in 2022 and Green Valley Academy at Edgar Allan Poe in 2021. 
+
+The majority are from Baltimore City and Baltimore County.
 
 ```{r}
 extreme_outliers <- total |>
@@ -435,38 +393,22 @@ extreme_outliers <- total |>
 
 ```
 
-These are the top schools that have high z-scores >3
+**ANOVA TEST**
 
-1. Meadowood Education Center in 2023
-2. Renaissance Academy in 2022
-3.Achievement Academy at Harbor City High in 2024
-4.Excel Academy at Francis M. Wood High in 2022
+We have established the Z-scores of the entire dataset. We were able to identify
+schools with the highest rates of chronic absenteeism in different years.
 
-*All of these are in Baltimore County and Baltimore City.
+Now, I will be using the ANOVA Test to compare the mean of the three school types in Maryland
+to determine the difference between them. This will help
+me define which school type has the highest rate of absenteeism. 
 
-To Derek:
+Part 1: 
+First thing that I will do is create a new dataset that has all the averages
+from all the schools for their chronic absenteeism. Then I grouped it by school name, county, and school type.
 
-- I did the Z-score test and was able to see what schools are the worst in range of absenteeism. 
-
-- I would not say that I have completely proven that absenteeism has increased in Md public schools, but I'm getting there.
-
-- There are 394 outliers from individual schools and 71 are extreme outliers. 
-
-- Now we have a number of the schools that can be possibly used to see about the ethnicity thing originally.
-
-*I have not been able to completely prove that absenteeism has increased* I'm on my way to do it, but what should I do to prove it then?
-
-MAY 17, 2024
-
-DEREK SUGGESTION! 
-This is good stuff, and your z-scores work in particular are leading you to some excellent ideas. My suggestions:
-
-Regression - you've got chronic absentee percentage and can do see to what extend you can predict that using other variables like attend_rate_pct.
-ANOVA - you can do an ANOVA test using the chronic absentee pct and school type, but you want to use an average instead of each absentee pct. So you'd do something like this:
-https://gist.github.com/dwillis/f0131c4b0709322dad6b5d49d54280d0
-and then use the avg_chronic_absent in your ANOVA test and follow up with a TukeyHSD test to see the differences between school types. (DOING THIS!)
-
-ANOVA TEST
+I filtered out "All" and "All Students" because that is the aggregation of the
+entire school district and school district type and I didn't want those outputs
+to change my results. It would have inflated my calculations.
 
 ```{r}
 school_averages <- total |>
@@ -481,35 +423,106 @@ school_averages <- total |>
   )
 ```
 
+Part 2: The test
+
+This is my ANOVA Test. I wanted to see the relationship between the average chronic absenteeism and also the school type.
+
+The results show that there is a very low probability that the differences between school types occurred by random chance (p < 2e-16). There is a statistically significant difference in chronic absenteeism rates across school types.
+
+The F-value of 78.69 suggests that the variation between school types is large compared to the variation within each type, meaning school type is a meaningful factor.
+
+However, school type does not fully explain the differences in absenteeism. There is 375101 residuals, meaning that most variation is due to other factors not included in the model. 
+
+Factors like issues with transportation and wealth inequality could be factors that explain the variation between schools. 
 
 ```{r}
 period_anova <- aov(avg_chronic_absent ~ school_type, data = school_averages)
 summary(period_anova)
 ```
+Part 3: TUKEY TEST
 
+Once my ANOVA test proved that the difference between school-type and chronic absenteeism is statistically significant, I will be using the Tukey HSD Test.
+
+This will help me compare the difference of the means grouped by ANOVA, and will let me identify which of the the 3 groups are significantly different from each other.
+
+Results:
+
+High schools have on average 11.86 percentage points higher chronic absenteeism than elementary schools. This is statistically significant.cMiddle schools also have higher chronic absenteeism than elementary schools — by about 5.14 percentage points.
+
+This pattern is statistically significant across all pairwise comparisons. I have solid evidence that chronic absenteeism increases with school level.
 
 ```{r}
 tukey_results <- TukeyHSD(period_anova)
 print(tukey_results)
 ```
+**Visualization - Boxplot**
 
-RESULTS
+To visualize my ANOVA test results, I created a box plot that shows the 
+difference between the averages of the three school types (elementary,
+middle and high school). The overall trend shows that high schools have the
+highest average rate of chronic absenteeism. We can also see that high school
+has the higher variability. 
 
-High schools have on average 11.86 percentage points higher chronic absenteeism than elementary schools. This is statistically significant.
+All three school types have outliers that are more than 50%. Although, elementary schools have the lowest average chronic absenteeism rate compared to the other two,
+it has the largest number of outliers meaning that a good amount of schools have 
+schools with really high rates. 
 
-Middle schools also have higher chronic absenteeism than elementary schools — by about 5.14 percentage points.
+I found the code to creating a boxplot from JOUR472 last semester.
 
-**This pattern is statistically significant across all pairwise comparisons. I have solid evidence that chronic absenteeism increases with school level.** AKA older students skip instead of it being that elementatry school kids don't go to school bc parents cant take them there or something. 
+```{r}
+# Find code in JOUR472 Github and in one of the anova test notebook. 
+ggplot(school_averages, aes(x = school_type, y = avg_chronic_absent, fill = school_type)) +
+  geom_boxplot(alpha = 0.9) +
+  scale_fill_manual(values = c("purple", "pink", "magenta")) + #THIS IS FROM JOUR472 notebook 
+  labs(
+    title = "Chronic Absenteeism by School Type in Maryland Public Schools",
+    x = "",
+    y = "Average Chronic Absenteeism Rate (%)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+
+This code is to see what are the schools with the highest average chronic absenteeism. 
+
+```{r}
+school_averages |> arrange(desc(avg_chronic_absent))
+```
+**Story Pitch** 
+
+I want to write a data-driven story about how chronic absenteeism affects mostly high school
+students in Maryland and which are the schools struggling the most and who are the students
+in these schools that skip class. 
+
+In my statistical analysis, I found that chronic absenteeism in Maryland public schools averaged
+33.42% and a standard deviation of 17.42% from 2019 to 2024. When I calculated, the 
+average of each public school using the total dataset, I found the top schools for
+chronic absenteeism. Among the top 10 schools all had over 85% absentee rates and student
+populations that were over 97% minority. Most were located in Baltimore City.
+
+With this information, I would go to the schools to view the conditions and interview
+students, teachers, principals and other personnel about why they have such high rates
+ of absenteeism. 
+
+Using our Z-score analysis, I identified 71 schools as outliers over six school years. I plan to visit also visit these schools to investigate and explore what strategies, if any, were used to lower their chronic absenteeism from their peak established in the analysis. 
+
+From my Tukey test, we found that chronic absenteeism increases with school type, with high schools having 11.86% more average chronic absenteeism than elementary schools and middle schools are 6.72 points lower than high schools. 
+
+I will interview officials in the Maryland Department of Education to figure out what is being implemented statewide to tackle this issue. Furthermore, I would interview community leaders and parents in the area to have their input on why students aren't going to class. 
+
+From my ANOVA test, I was able to find that there is statistically significant
+difference between the averages between the 3 school types. However, the ANOVA
+model results about school type only explains a small percentage of variation.
 
 
+With that in mind, I will have to analyze additional data relating to transportation, income inequality, etc to be able to inform readers of possible reasons why these schools have such high levels of absenteeism.
 
+Using the dataset for ANOVA and Tukey, I would include my box plot in my reporting to help visualize
+this to readers. Although high schoolers have the higher rates of chronic absenteeism, middle schools and
+elementary schools are also facing this crisis as well. I would make a point that elementary schools has the lowest average of chronic absenteeism, but also has the highest number of outliers that range from 50% to almost 80%.
 
-
-
-
-
-
-
+With all of these elements together, I wil be able to write an in-depth investigative story about chronic absenteeism in Maryland.
 
 
 
